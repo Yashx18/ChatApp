@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { MdChat } from "react-icons/md";
 
 const Home = () => {
   const inputRef = useRef(null);
@@ -46,13 +47,13 @@ const Home = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-between w-full max-w-200 h-full text-white">
+    <div className="flex flex-col items-center justify-between h-full w-full max-w-2xl text-[#ebebeb] border">
       <div className="flex items-center flex-col justify-center mt-18">
         <h1 className="text-5xl font-medium font-instrument-serif italic mb-1">
           Chit Chat
         </h1>
         <span className="text-md font-light text-[#acacac]">
-          one-time end-to-end encrypted anonymous chats
+          Real-time end-to-end encrypted anonymous chats
         </span>
       </div>
       <div className="w-full max-w-100 flex flex-col items-center justify-center font-geist">
@@ -66,13 +67,13 @@ const Home = () => {
         <input
           type="text"
           ref={usernameRef}
-          className="bg-[#000000] border px-4 py-3 border-[#333333] rounded-full focus-within:border-[#e0e0e0] focus-within:outline-none w-full text-center placeholder:font-light"
+          className="bg-[#000000] border px-4 py-3 borpder-[#333333] rounded-full focus-within:border-[#e0e0e0] focus-within:outline-none w-full text-center placeholder:font-light"
           placeholder="What should we call you ?"
         />
 
         <button
           type="submit"
-          className="bg-white text-black w-full py-3 mt-4 rounded-full cursor-pointer hover:bg-[#e7e7e7] font-bold"
+          className="bg-white text-black w-full py-3 mt-4 rounded-full cursor-pointer hover:bg-[#e7e7e7] font-semibold"
           onClick={joinRoom}
         >
           Join Room
@@ -80,15 +81,15 @@ const Home = () => {
 
         <span className="my-4 text-[#646464]">or</span>
 
-        <div className="w-full">
-          <button
-            type="submit"
-            className="bg-white text-black w-full py-3 rounded-full cursor-pointer hover:bg-[#e7e7e7] font-bold"
-            onClick={joinRoom}
-          >
-            Start New Private Chat
-          </button>
-        </div>
+        <button
+          type="submit"
+          className="bg-white text-black w-full py-3 rounded-full cursor-pointer hover:bg-[#e7e7e7] font-semibold flex items-center justify-center
+          mb-2"
+          onClick={joinRoom}
+        >
+          <MdChat className="mr-2" />
+          Start New Private Chat
+        </button>
         <div className="border border-[#333333] w-full mt-4 flex flex-col items-start justify-center p-4 rounded-lg">
           <p>Available rooms</p>
           <p className="text-sm font-light text-[#646464]">
