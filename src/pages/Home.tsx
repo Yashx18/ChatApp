@@ -47,7 +47,8 @@ const Home = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-between h-full w-full max-w-2xl text-[#ebebeb] border">
+    <div className="flex flex-col items-center justify-between h-full w-full max-w-3xl text-[#ebebeb] bg-[#0e0e0e]
+    shadow-lg">
       <div className="flex items-center flex-col justify-center mt-18">
         <h1 className="text-5xl font-medium font-instrument-serif italic mb-1">
           Chit Chat
@@ -67,7 +68,7 @@ const Home = () => {
         <input
           type="text"
           ref={usernameRef}
-          className="bg-[#000000] border px-4 py-3 borpder-[#333333] rounded-full focus-within:border-[#e0e0e0] focus-within:outline-none w-full text-center placeholder:font-light"
+          className="bg-[#000000] border px-4 py-3 border-[#333333] rounded-full focus-within:border-[#e0e0e0] focus-within:outline-none w-full text-center placeholder:font-light"
           placeholder="What should we call you ?"
         />
 
@@ -98,7 +99,7 @@ const Home = () => {
         </div>
       </div>
       <p className="mb-2 text-[#646464] ">
-        messages are end-to-end encrypted and never stored
+        messages are end-to-end encrypted and never stored.
       </p>
     </div>
   );
