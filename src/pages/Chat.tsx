@@ -3,11 +3,13 @@ import { MdArrowUpward } from "react-icons/md";
 import { FiUsers } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import MsgCard from "../components/msgCard";
+import { useRoom } from "../store";
 
 const Chat = () => {
   const msgRef = useRef<HTMLInputElement>(null);
   const members = 1;
   const [msgArr, setMsgArr] = useState<string[]>([]);
+  const { room } = useRoom();
 
   const sendMsg = () => {
     const msgVal = msgRef.current?.value;
@@ -40,7 +42,7 @@ const Chat = () => {
             </span>
           </Link>
           <span className="border px-4 py-2 rounded-4xl bg-[#1d1d1d52] border-[#63636352]">
-            Room code
+            {room}
           </span>
           <span className=" flex items-center justify-center px-3 py-1 border rounded-4xl bg-[#42424252] border-[#63636352]">
             <FiUsers className="size-5" />
