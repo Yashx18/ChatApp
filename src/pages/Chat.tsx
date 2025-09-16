@@ -26,7 +26,6 @@ const Chat = () => {
     msgArr.map((item: any) => {
       console.log(item);
     });
-    console.log(msgArr);
   }, [msgArr]);
   
   return (
@@ -52,14 +51,6 @@ const Chat = () => {
         <div className="w-full h-10/12 border-x border-t border-[#ffffff15] rounded-t-xl flex items-center justify-center flex-col bg-[#0a0a0a] relative text-[#a0a0a0]">
           <div className="w-full h-full px-2 py-2 flex items-center justify-center flex-col">
             No messages yet. Start the Conversation!
-            <MsgCard
-              text="yo by me w-full h-full px-2 py-2 flex items-center justify-center flex-col"
-              by="me"
-            />
-            <MsgCard
-              text="yo by others w-full h-full px-2 py-2 flex items-center justify-center flex-col"
-              by="others"
-            />
           </div>
           <form
             className="w-full flex p-2 rounded-xl border-t border-[#ffffff1e]"

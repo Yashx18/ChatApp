@@ -3,20 +3,22 @@ import { MdChat } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { randomHash } from "../utils";
 import { useRoom } from "../store";
+import { useWebSocket } from "../store";
 import { useUsername } from "../store";
 
 const Home = () => {
   const navigate = useNavigate();
-  
   const inputRef = useRef(null);
   const API_URL = import.meta.env.VITE_API_URL;
   const wsRef = useRef<WebSocket | null>(null);
   const [allMessages, setAllMessages] = useState<string[]>([]);
-  
+  const { setWS } = useWebSocket();
+
   const { setRoom } = useRoom();
   useEffect(() => {
     const ws = new WebSocket(API_URL);
     wsRef.current = ws;
+    setWS(ws);
     console.log(ws);
 
     ws.onopen = () => {
@@ -161,7 +163,9 @@ const Home = () => {
           type="submit"
           className="bg-white text-black w-full py-3 rounded-full cursor-pointer hover:bg-[#e7e7e7] font-semibold flex items-center justify-center
           mb-2"
-          onClick={createRoom}
+          onClick={() => {
+            navigate("/connecting");
+          }}
         >
           <MdChat className="mr-2" />
           Start New Private Chat

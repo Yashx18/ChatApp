@@ -19,3 +19,13 @@ export const useUsername = create<usernameData>((set) => ({
   username: "",
   setUsername: (value) => set({ username: value }),
 }));
+
+interface WebSocketData {
+  ws: WebSocket | null;
+  setWS: (value: WebSocket) => void;
+}
+
+export const useWebSocket = create<WebSocketData>((set) => ({
+  ws: null,
+  setWS: (value) => set({ ws: value }),
+}));
