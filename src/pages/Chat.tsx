@@ -4,12 +4,23 @@ import { FiUsers } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import MsgCard from "../components/msgCard";
 import { useRoom } from "../store";
+import { useWebSocket } from "../store";
 
 const Chat = () => {
   const msgRef = useRef<HTMLInputElement>(null);
-  const members = 1;
   const [msgArr, setMsgArr] = useState<string[]>([]);
   const { room } = useRoom();
+  const { ws } = useWebSocket();
+  const [members, setMembers] = useState(0);
+
+  if (ws && typeof ws.onmessage !== "undefined" && ws.onmessage !== null) {
+    ws.onmessage = async (ev) => {
+      const response = await ev.data;
+      const result = JSON.parse(response);
+      setMembers(result.userCount);
+      console.log(result.userCount);
+    };
+  }
 
   const sendMsg = () => {
     const msgVal = msgRef.current?.value;
@@ -27,7 +38,7 @@ const Chat = () => {
       console.log(item);
     });
   }, [msgArr]);
-  
+
   return (
     <div className="w-screen h-full flex items-center justify-center bg-[#0a0a0a] text-[#ebebeb]">
       <div

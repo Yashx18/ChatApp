@@ -2,11 +2,13 @@ import { useRef } from "react";
 import { randomHash } from "../utils";
 import { useNavigate } from "react-router-dom";
 import { useWebSocket } from "../store";
+import { useRoom } from "../store";
 
 const Connecting = () => {
-	const navigate = useNavigate();
-	const { ws } = useWebSocket();
+  const navigate = useNavigate();
+  const { ws } = useWebSocket();
   const usernameRef = useRef<HTMLInputElement>(null);
+  const { setRoom } = useRoom();
   const createRoom = () => {
     const username = usernameRef.current?.value;
 
@@ -15,12 +17,14 @@ const Connecting = () => {
       usernameRef.current.value = "";
     }
     const roomId = randomHash(10);
+    setRoom(roomId);
     if (ws) {
       try {
         ws.send(
           JSON.stringify({
             type: "join",
             payload: {
+              name: username,
               roomId: roomId,
             },
           })
@@ -29,10 +33,10 @@ const Connecting = () => {
 
         navigate("/chat");
 
-          ws.onmessage = (ev) => {
-        	console.log(ev.data);
-        	// setAllMessages((mes) => [...mes, ev.data]);
-          };
+        // ws.onmessage = (ev) => {
+        //   console.log(ev.data);
+        //   // setAllMessages((mes) => [...mes, ev.data]);
+        // };
       } catch (error) {
         console.error(error);
       }

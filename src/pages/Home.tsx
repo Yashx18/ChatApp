@@ -42,8 +42,8 @@ const Home = () => {
           JSON.stringify({
             type: "join",
             payload: {
-              name: username,
-              roomId: roomId,
+              name: usernameVal,
+              roomId: roomVal,
             },
           })
         );
@@ -51,10 +51,10 @@ const Home = () => {
 
         navigate("/chat");
 
-        ws.onmessage = (ev) => {
-          console.log(ev.data);
-          setAllMessages((mes) => [...mes, ev.data]);
-        };
+        // ws.onmessage = (ev) => {
+        //   console.log(ev.data);
+        //   setAllMessages((mes) => [...mes, ev.data]);
+        // };
       } catch (error) {
         console.error(error);
       }
