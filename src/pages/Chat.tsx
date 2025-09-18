@@ -2,42 +2,42 @@ import { useEffect, useRef, useState } from "react";
 import { MdArrowUpward } from "react-icons/md";
 import { FiUsers } from "react-icons/fi";
 import { Link } from "react-router-dom";
-import MsgCard from "../components/msgCard";
+// import MsgCard from "../components/msgCard";
 import { useRoom } from "../store";
 import { useWebSocket } from "../store";
+import { useMembers } from "../store";
 
 const Chat = () => {
   const msgRef = useRef<HTMLInputElement>(null);
   const [msgArr, setMsgArr] = useState<string[]>([]);
   const { room } = useRoom();
   const { ws } = useWebSocket();
-  const [members, setMembers] = useState(0);
+  const { members, connect } = useMembers();
+
+  console.log(members);
 
   if (ws && typeof ws.onmessage !== "undefined" && ws.onmessage !== null) {
     ws.onmessage = async (ev) => {
       const response = await ev.data;
       const result = JSON.parse(response);
-      setMembers(result.userCount);
       console.log(result.userCount);
     };
   }
 
-  const sendMsg = () => {
-    const msgVal = msgRef.current?.value;
-    msgArr.push();
-    if (msgRef.current) {
-      msgRef.current.value = "";
-    }
-    if (msgVal) {
-      setMsgArr([...msgArr, msgVal.trim()]);
-    }
-  };
-
+  // const sendMsg = () => {
+  //   const msgVal = msgRef.current?.value;
+  //   msgArr.push();
+  //   if (msgRef.current) {
+  //     msgRef.current.value = "";
+  //   }
+  //   if (msgVal) {
+  //     setMsgArr([...msgArr, msgVal.trim()]);
+  //   }
+  // };
+  
   useEffect(() => {
-    msgArr.map((item: any) => {
-      console.log(item);
-    });
-  }, [msgArr]);
+    connect();
+  }, []);
 
   return (
     <div className="w-screen h-full flex items-center justify-center bg-[#0a0a0a] text-[#ebebeb]">
@@ -67,7 +67,7 @@ const Chat = () => {
             className="w-full flex p-2 rounded-xl border-t border-[#ffffff1e]"
             onSubmit={(e) => {
               e.preventDefault();
-              sendMsg();
+              // sendMsg();
             }}
           >
             <input

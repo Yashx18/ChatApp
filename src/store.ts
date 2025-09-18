@@ -11,8 +11,8 @@ export const useRoom = create<roomData>((set) => ({
 }));
 
 interface usernameData {
-    username: string;
-    setUsername: (value: string) => void;
+  username: string;
+  setUsername: (value: string) => void;
 }
 
 export const useUsername = create<usernameData>((set) => ({
@@ -22,10 +22,54 @@ export const useUsername = create<usernameData>((set) => ({
 
 interface WebSocketData {
   ws: WebSocket | null;
-  setWS: (value: WebSocket) => void;
+  connect: () => void;
 }
+const API_URL = import.meta.env.VITE_API_URL;
 
 export const useWebSocket = create<WebSocketData>((set) => ({
   ws: null,
-  setWS: (value) => set({ ws: value }),
+
+  connect: () => {
+    const ws = new WebSocket(API_URL);
+
+    ws.onopen = () => {
+      console.log("Connected to server");
+    };
+
+    set({ ws });
+  },
+}));
+
+interface MembersData {
+  members: number;
+  connect: () => void;
+}
+
+export const useMembers = create<MembersData>((set) => ({
+  members: 0,
+
+  connect: () => {
+    const ws = useWebSocket.getState().ws;
+
+    if (ws) {
+      ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+
+          if (
+            (data.type === "system" || data.type === "chat") &&
+            typeof data.userCount === "number"
+          ) {
+            set({ members: data.userCount });
+          }
+        } catch (err) {
+          console.error("Failed to parse WS message:", err);
+        }
+      };
+
+      ws.onclose = () => {
+        set({ members: 0 });
+      };
+    }
+  },
 }));

@@ -9,32 +9,19 @@ import { useUsername } from "../store";
 const Home = () => {
   const navigate = useNavigate();
   const inputRef = useRef(null);
-  const API_URL = import.meta.env.VITE_API_URL;
-  const wsRef = useRef<WebSocket | null>(null);
+  const { ws, connect } = useWebSocket();
   const [allMessages, setAllMessages] = useState<string[]>([]);
-  const { setWS } = useWebSocket();
-
   const { setRoom } = useRoom();
-  useEffect(() => {
-    const ws = new WebSocket(API_URL);
-    wsRef.current = ws;
-    setWS(ws);
-    console.log(ws);
-
-    ws.onopen = () => {
-      console.log("Server running");
-    };
-  }, []);
-
   const roomRef = useRef<HTMLInputElement>(null);
   const usernameRef = useRef<HTMLInputElement>(null);
   const [roomId, setRoomId] = useState("");
   const [username, setUsername] = useState("");
-
+  useEffect(() => {
+    connect();
+  }, []);
   const join = () => {
     const roomVal = roomRef.current?.value;
     const usernameVal = usernameRef.current?.value;
-    const ws = wsRef.current;
     console.log(roomVal, usernameVal);
     if (ws) {
       try {
@@ -70,7 +57,6 @@ const Home = () => {
   const createRoom = () => {
     const roomId = randomHash(10);
     setRoom(roomId);
-    const ws = wsRef.current;
     if (ws) {
       try {
         ws.send(
