@@ -1,28 +1,20 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { MdArrowUpward } from "react-icons/md";
 import { FiUsers } from "react-icons/fi";
 import { Link } from "react-router-dom";
 // import MsgCard from "../components/msgCard";
 import { useRoom } from "../store";
-import { useWebSocket } from "../store";
+// import { useWebSocket } from "../store";
 import { useMembers } from "../store";
 
 const Chat = () => {
   const msgRef = useRef<HTMLInputElement>(null);
-  const [msgArr, setMsgArr] = useState<string[]>([]);
   const { room } = useRoom();
-  const { ws } = useWebSocket();
   const { members, connect } = useMembers();
+  // const [msgArr, setMsgArr] = useState<string[]>([]);
+  // const { ws } = useWebSocket();
 
   console.log(members);
-
-  if (ws && typeof ws.onmessage !== "undefined" && ws.onmessage !== null) {
-    ws.onmessage = async (ev) => {
-      const response = await ev.data;
-      const result = JSON.parse(response);
-      console.log(result.userCount);
-    };
-  }
 
   // const sendMsg = () => {
   //   const msgVal = msgRef.current?.value;

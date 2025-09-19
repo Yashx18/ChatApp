@@ -1,15 +1,22 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 interface roomData {
   room: string;
   setRoom: (value: string) => void;
 }
 
-export const useRoom = create<roomData>((set) => ({
-  room: "",
-  setRoom: (value) => set({ room: value }),
-}));
-
+export const useRoom = create<roomData>()(
+  persist(
+    (set : any) => ({
+      room: "",
+      setRoom: (value : any) => set({ room: value }),
+    }),
+    {
+      name: "room-storage", 
+    }
+  )
+);
 interface usernameData {
   username: string;
   setUsername: (value: string) => void;
@@ -52,6 +59,18 @@ export const useMembers = create<MembersData>((set) => ({
     const ws = useWebSocket.getState().ws;
 
     if (ws) {
+      ws.onopen = () => {
+        ws.send(
+          JSON.stringify({
+            type: "join",
+            payload: {
+              roomId: useRoom.getState().room,
+              name: useUsername.getState().username || "Anonymous",
+            },
+          })
+        );
+      };
+
       ws.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data);
