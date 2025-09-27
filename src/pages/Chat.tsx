@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { MdArrowUpward } from "react-icons/md";
 import { FiUsers } from "react-icons/fi";
 import { Link } from "react-router-dom";
-// import MsgCard from "../components/msgCard";
+import MsgCard from "../components/msgCard";
 import { useRoom } from "../store";
 // import { useWebSocket } from "../store";
 import { useMembers } from "../store";
@@ -10,9 +10,11 @@ import { useMembers } from "../store";
 const Chat = () => {
   const msgRef = useRef<HTMLInputElement>(null);
   const { room } = useRoom();
-  const { members, connect } = useMembers();
+  const { members, connect, joined } = useMembers();
   // const [msgArr, setMsgArr] = useState<string[]>([]);
   // const { ws } = useWebSocket();
+
+  console.log(joined);
 
   console.log(members);
 
@@ -26,7 +28,7 @@ const Chat = () => {
   //     setMsgArr([...msgArr, msgVal.trim()]);
   //   }
   // };
-  
+
   useEffect(() => {
     connect();
   }, []);
@@ -53,7 +55,9 @@ const Chat = () => {
         </div>
         <div className="w-full h-10/12 border-x border-t border-[#ffffff15] rounded-t-xl flex items-center justify-center flex-col bg-[#0a0a0a] relative text-[#a0a0a0]">
           <div className="w-full h-full px-2 py-2 flex items-center justify-center flex-col">
-            No messages yet. Start the Conversation!
+            {joined.map((e) => (
+              <MsgCard text={e.message} by={e.type} />
+            ))}
           </div>
           <form
             className="w-full flex p-2 rounded-xl border-t border-[#ffffff1e]"
