@@ -1,8 +1,8 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { MdArrowUpward } from "react-icons/md";
 import { FiUsers } from "react-icons/fi";
 import { Link } from "react-router-dom";
-import MsgCard from "../components/msgCard";
+import { Copy, Check } from "lucide-react"; import MsgCard from "../components/msgCard";
 import { useRoom } from "../store";
 // import { useWebSocket } from "../store";
 import { useMembers } from "../store";
@@ -11,27 +11,22 @@ const Chat = () => {
   const msgRef = useRef<HTMLInputElement>(null);
   const { room } = useRoom();
   const { members, connect, joined } = useMembers();
-  // const [msgArr, setMsgArr] = useState<string[]>([]);
-  // const { ws } = useWebSocket();
-
-  console.log(joined);
-
-  console.log(members);
-
-  // const sendMsg = () => {
-  //   const msgVal = msgRef.current?.value;
-  //   msgArr.push();
-  //   if (msgRef.current) {
-  //     msgRef.current.value = "";
-  //   }
-  //   if (msgVal) {
-  //     setMsgArr([...msgArr, msgVal.trim()]);
-  //   }
-  // };
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     connect();
   }, []);
+
+  const handleCopy = async () => {
+    if (!room) return;
+    try {
+      await navigator.clipboard.writeText(room);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000); 
+    } catch (err) {
+      console.error("Failed to copy roomId: ", err);
+    }
+  };
 
   return (
     <div className="w-screen h-full flex items-center justify-center bg-[#0a0a0a] text-[#ebebeb]">
@@ -45,14 +40,25 @@ const Chat = () => {
               Chit Chat
             </span>
           </Link>
-          <span className="border px-4 py-2 rounded-4xl bg-[#1d1d1d52] border-[#63636352]">
-            {room}
-          </span>
-          <span className=" flex items-center justify-center px-3 py-1 border rounded-4xl bg-[#42424252] border-[#63636352]">
+
+          <button
+            onClick={handleCopy}
+            className="flex items-center gap-2 border px-4 py-2 rounded-4xl bg-[#1d1d1d52] border-[#63636352] hover:bg-[#2a2a2a7a] transition"
+          >
+            <span className="font-mono">{room}</span>
+            {copied ? (
+              <Check className="w-4 h-4 text-green-500" />
+            ) : (
+              <Copy className="w-4 h-4 cursor-pointer text-gray-400" />
+            )}
+          </button>
+
+          <span className="flex items-center justify-center px-3 py-1 border rounded-4xl bg-[#42424252] border-[#63636352]">
             <FiUsers className="size-5" />
             <span className="text-lg ml-2">{members}</span>
           </span>
         </div>
+
         <div className="w-full h-10/12 border-x border-t border-[#ffffff15] rounded-t-xl flex items-center justify-center flex-col bg-[#0a0a0a] relative text-[#a0a0a0]">
           <div className="w-full h-full px-2 py-2 flex items-center justify-center flex-col">
             {joined.map((e) => (
