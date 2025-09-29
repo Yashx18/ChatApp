@@ -2,30 +2,60 @@ import { useEffect, useRef, useState } from "react";
 import { MdArrowUpward } from "react-icons/md";
 import { FiUsers } from "react-icons/fi";
 import { Link } from "react-router-dom";
-import { Copy, Check } from "lucide-react"; import MsgCard from "../components/msgCard";
+import { Copy, Check } from "lucide-react";
+import MsgCard from "../components/msgCard";
 import { useRoom } from "../store";
-// import { useWebSocket } from "../store";
+import { useWebSocket } from "../store";
 import { useMembers } from "../store";
+import { useUsername } from "../store";
 
 const Chat = () => {
+  useEffect(() => {
+    connect();
+  }, []);
+  const { ws } = useWebSocket();
   const msgRef = useRef<HTMLInputElement>(null);
   const { room } = useRoom();
   const { members, connect, joined } = useMembers();
   const [copied, setCopied] = useState(false);
-
-  useEffect(() => {
-    connect();
-  }, []);
+  const { username } = useUsername();
 
   const handleCopy = async () => {
     if (!room) return;
     try {
       await navigator.clipboard.writeText(room);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000); 
+      setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       console.error("Failed to copy roomId: ", err);
     }
+  };
+
+  const sendMsg = () => {
+    if (!msgRef.current || !msgRef.current.value.trim()) return;
+
+    const message = msgRef.current.value;
+    console.log(username);
+    console.log(joined);
+    joined.push(message);
+    
+
+    if (ws ) {
+      ws.send(
+        JSON.stringify({
+          type: "chat",
+          payload: {
+            roomId: room,
+            name: username,
+            message: message,
+          },
+        })
+      );
+    } else {
+      console.warn("WebSocket is not connected.");
+    }
+
+    msgRef.current.value = "";
   };
 
   return (
@@ -69,7 +99,7 @@ const Chat = () => {
             className="w-full flex p-2 rounded-xl border-t border-[#ffffff1e]"
             onSubmit={(e) => {
               e.preventDefault();
-              // sendMsg();
+              sendMsg();
             }}
           >
             <input
