@@ -16,9 +16,27 @@ const Home = () => {
   const usernameRef = useRef<HTMLInputElement>(null);
   const [roomId, setRoomId] = useState("");
   const [username, setUsername] = useState("");
+  const [rooms, setRooms] = useState<string[]>([]);
+
   useEffect(() => {
     connect();
   }, []);
+
+  useEffect(() => {
+    if (!ws) return;
+
+    ws.onmessage = (ev) => {
+      const data = JSON.parse(ev.data);
+      if (data.type === "rooms") {
+        setRooms(data.payload);
+      }
+    };
+
+    // request available rooms after connecting
+    ws.onopen = () => {
+      ws.send(JSON.stringify({ type: "getRooms" }));
+    };
+  }, [ws]);
   const join = () => {
     const roomVal = roomRef.current?.value;
     const usernameVal = usernameRef.current?.value;
@@ -158,9 +176,23 @@ const Home = () => {
         </button>
         <div className="border border-[#333333] w-full mt-4 flex flex-col items-start justify-center p-4 rounded-lg">
           <p>Available rooms</p>
-          <p className="text-sm font-light text-[#646464]">
-            No public rooms found. Create one or join with a code.
-          </p>
+          {rooms.length === 0 ? (
+            <p className="text-sm font-light text-[#646464]">
+              No public rooms found. Create one or join with a code.
+            </p>
+          ) : (
+            <ul className="text-sm font-light text-[#ebebeb] mt-2">
+              {rooms.map((room) => (
+                <li
+                  key={room}
+                  className="cursor-pointer hover:underline"
+                  onClick={() => (roomRef.current!.value = room)}
+                >
+                  {room}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </div>
       <p className="mb-2 text-[#646464] ">

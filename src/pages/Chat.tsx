@@ -36,11 +36,10 @@ const Chat = () => {
 
     const message = msgRef.current.value;
     console.log(username);
-    console.log(joined);
+    // console.log(joined);
     joined.push(message);
-    
 
-    if (ws ) {
+    if (ws) {
       ws.send(
         JSON.stringify({
           type: "chat",
@@ -57,6 +56,16 @@ const Chat = () => {
 
     msgRef.current.value = "";
   };
+
+  if (ws) {
+    ws.onmessage = (event) => {
+      try {
+        console.log(event.data);
+      } catch (error) {
+        console.error(console.error());
+      }
+    };
+  }
 
   return (
     <div className="w-screen h-full flex items-center justify-center bg-[#0a0a0a] text-[#ebebeb]">
