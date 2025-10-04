@@ -9,16 +9,33 @@ import { useWebSocket } from "../store";
 import { useMembers } from "../store";
 import { useUsername } from "../store";
 
+type MessageType = "me" | "others" | "system";
+
+interface Message {
+  type: MessageType;
+  message: string;
+}
+
 const Chat = () => {
-  useEffect(() => {
-    connect();
-  }, []);
   const { ws } = useWebSocket();
   const msgRef = useRef<HTMLInputElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   const { room } = useRoom();
-  const { members, connect, joined } = useMembers();
+  const { members, connect } = useMembers();
   const [copied, setCopied] = useState(false);
   const { username } = useUsername();
+
+  const [messages, setMessages] = useState<Message[]>([]);
+
+  // Connect to members on mount
+  useEffect(() => {
+    connect();
+  }, [connect]);
+
+  // Auto-scroll to bottom when new message arrives
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   const handleCopy = async () => {
     if (!room) return;
@@ -35,19 +52,18 @@ const Chat = () => {
     if (!msgRef.current || !msgRef.current.value.trim()) return;
 
     const message = msgRef.current.value;
-    console.log(username);
-    // console.log(joined);
-    joined.push(message);
 
+    // Optimistic update: show own message immediately
+    setMessages((prev) => [...prev, { type: "me", message }]);
+
+    // Send via WebSocket
     if (ws) {
       ws.send(
         JSON.stringify({
           type: "chat",
-          payload: {
-            roomId: room,
-            name: username,
-            message: message,
-          },
+          roomId: room,
+          name: username,
+          message,
         })
       );
     } else {
@@ -57,22 +73,47 @@ const Chat = () => {
     msgRef.current.value = "";
   };
 
-  if (ws) {
+  // Listen for incoming messages
+  useEffect(() => {
+    if (!ws) return;
+
     ws.onmessage = (event) => {
       try {
-        console.log(event.data);
+        const data = JSON.parse(event.data);
+
+        // Chat messages from other users
+        if (data.type === "chat") {
+          if (data.name !== username) {
+            setMessages((prev) => [
+              ...prev,
+              {
+                type: "others",
+                message: data.message,
+              },
+            ]);
+          }
+        }
+
+        // System messages
+        if (data.type === "system") {
+          setMessages((prev) => [
+            ...prev,
+            {
+              type: "system",
+              message: data.message,
+            },
+          ]);
+        }
       } catch (error) {
-        console.error(console.error());
+        console.error("Error parsing message:", error);
       }
     };
-  }
+  }, [ws, username]);
 
   return (
     <div className="w-screen h-full flex items-center justify-center bg-[#0a0a0a] text-[#ebebeb]">
-      <div
-        className="bg-[#0e0e0e] w-full max-w-3xl h-full flex flex-col items-center 
-	  justify-between px-6 shadow-lg"
-      >
+      <div className="bg-[#0e0e0e] w-full max-w-3xl h-full flex flex-col items-center justify-between px-6 shadow-lg">
+        {/* Header */}
         <div className="w-full py-4 flex items-center justify-between">
           <Link to={"/home"}>
             <span className="font-instrument-serif italic text-2xl cursor-pointer">
@@ -98,12 +139,16 @@ const Chat = () => {
           </span>
         </div>
 
-        <div className="w-full h-10/12 border-x border-t border-[#ffffff15] rounded-t-xl flex items-center justify-center flex-col bg-[#0a0a0a] relative text-[#a0a0a0]">
-          <div className="w-full h-full px-2 py-2 flex items-center justify-center flex-col">
-            {joined.map((e) => (
-              <MsgCard text={e.message} by={e.type} />
+        {/* Chat body */}
+        <div className="w-full h-10/12 border-x border-t border-[#ffffff15] rounded-t-xl flex flex-col bg-[#0a0a0a] relative text-[#a0a0a0]">
+          <div className="w-full h-full px-2 py-2 flex flex-col overflow-y-auto">
+            {messages.map((e, i) => (
+              <MsgCard key={i} text={e.message} by={e.type} />
             ))}
+            <div ref={messagesEndRef} />
           </div>
+
+          {/* Input form */}
           <form
             className="w-full flex p-2 rounded-xl border-t border-[#ffffff1e]"
             onSubmit={(e) => {
@@ -129,4 +174,5 @@ const Chat = () => {
     </div>
   );
 };
+
 export default Chat;

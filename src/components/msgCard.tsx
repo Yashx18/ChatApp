@@ -1,6 +1,6 @@
 interface CardProps{
 	text: string,
-	by: "others" | "me",
+	by: "others" | "me" | "system",
 }
 
 const CardStyleOuter = {
